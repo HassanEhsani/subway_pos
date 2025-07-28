@@ -17,7 +17,12 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Subway POS")
         self.resize(1000, 600)
-
+        
+        # #История заказов
+        # self.btn_history = QPushButton("📜 История заказов")
+        # self.btn_history.clicked.connect(self.show_order_history)
+        # cart_layout.addWidget(self.btn_history)
+    
         self.cart = []  # سبد خرید در حافظه
 
         # 📦 طراحی رابط کلی
@@ -98,6 +103,10 @@ class MainWindow(QWidget):
         cart_layout.addWidget(self.cart_list)
         cart_layout.addWidget(self.total_label)
         cart_layout.addWidget(self.btn_submit_order)
+        self.btn_history = QPushButton("📜 История заказов")
+        self.btn_history.clicked.connect(self.show_order_history)
+        cart_layout.addWidget(self.btn_history)
+
         
         ## order remove
         self.btn_remove_item = QPushButton("🗑 Удалить товар")
@@ -266,6 +275,37 @@ class MainWindow(QWidget):
                 self.cart.pop(row)
                 self.cart_list.takeItem(row)
                 self.update_total()
+    ## show order
+    def show_order_history(self):
+        history_window = QWidget()
+        history_window.setWindowTitle("История заказов")
+        history_layout = QVBoxLayout()
+
+        # اتصال به دیتابیس
+        connection = sqlite3.connect("db/database.sqlite")
+        cursor = connection.cursor()
+        cursor.execute("SELECT datetime, total_price, payment_method, order_details FROM orders ORDER BY datetime DESC")
+        orders = cursor.fetchall()
+
+        connection.close()
+
+        if not orders:
+            history_layout.addWidget(QLabel("Нет заказов."))
+        else:
+            for dt, total, method, details in orders:
+                label = QLabel(f"🕒 {dt} | 💰 {total} ₽ | 💳 {method}\n   ➤ {details}")
+                label.setStyleSheet("padding: 8px; border-bottom: 1px solid #ccc;")
+                history_layout.addWidget(label)
+
+
+        history_window.setLayout(history_layout)
+        history_window.resize(400, 500)
+        history_window.show()
+
+        # نگه‌داری مرجع پنجره، تا بسته نشه بلافاصله
+        self.history_window = history_window
+
+
 
 
 
