@@ -17,14 +17,12 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Subway POS")
         self.resize(1000, 600)
-        
-        # #История заказов
-        # self.btn_history = QPushButton("📜 История заказов")
-        # self.btn_history.clicked.connect(self.show_order_history)
-        # cart_layout.addWidget(self.btn_history)
-    
-        self.cart = []  # سبد خرید در حافظه
+        ## Theme
+        self.is_dark_mode = False  # حالت اولیه: روشن
+        self.set_light_theme()     # شروع با تم روشن
 
+        self.cart = []  # سبد خرید در حافظه
+       
         # 📦 طراحی رابط کلی
         main_layout = QHBoxLayout()
 
@@ -106,6 +104,12 @@ class MainWindow(QWidget):
         self.btn_history = QPushButton("📜 История заказов")
         self.btn_history.clicked.connect(self.show_order_history)
         cart_layout.addWidget(self.btn_history)
+        self.btn_toggle_theme = QPushButton()
+        self.btn_toggle_theme.setIcon(qta.icon("fa5s.moon"))  # شروع با تم روشن
+        self.btn_toggle_theme.setText(" Переключить тему")
+        self.btn_toggle_theme.clicked.connect(self.toggle_theme)
+        cart_layout.addWidget(self.btn_toggle_theme)
+
 
         
         ## order remove
@@ -304,6 +308,59 @@ class MainWindow(QWidget):
 
         # نگه‌داری مرجع پنجره، تا بسته نشه بلافاصله
         self.history_window = history_window
+        
+    def set_light_theme(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: white;
+                color: black;
+            }
+            QPushButton {
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #e0e0e0;
+            }
+            QListWidget {
+                background-color: #ffffff;
+            }
+        """)
+
+    def set_dark_theme(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #2e2e2e;
+                color: #e0e0e0;
+            }
+            QPushButton {
+                background-color: #3e3e3e;
+                color: #e0e0e0;
+                border: 1px solid #666;
+                padding: 8px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #4e4e4e;
+            }
+            QListWidget {
+                background-color: #3e3e3e;
+            }
+        """)
+    def toggle_theme(self):
+        if self.is_dark_mode:
+            self.set_light_theme()
+            self.btn_toggle_theme.setIcon(qta.icon("fa5s.moon"))  # ماه برای تم روشن
+            self.is_dark_mode = False
+        else:
+            self.set_dark_theme()
+            self.btn_toggle_theme.setIcon(qta.icon("fa5s.sun"))  # خورشید برای تم تاریک
+            self.is_dark_mode = True
+
+
+
 
 
 
